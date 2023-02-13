@@ -1,4 +1,19 @@
-const DATA_URL = `https://bitcoin24.com.ua/ajax/coursesv2.json`;
+const sendSelect = document.querySelector('.select--send');
+const getSelect = document.querySelector('.select--get');
+const sendInput = document.querySelector('.input--send');
+const getInput = document.querySelector('.input--get');
+const link = document.querySelector('.link')
+const titleGet = document.querySelector('.title--get');
+const titleSend = document.querySelector('.title--send');
+const nameMap = {
+}
+
+
+let sendCurrent = sendSelect.value || 'BTC';
+let getCurrent = getSelect.value || 'P24UAH';
+
+const reverse = document.querySelector('.reverse')
+
 let data = {
   P24UAH: {
     BTC: {
@@ -346,92 +361,104 @@ let data = {
   time_up: "1676215687",
 };
 
-const blockOut = document.querySelector(".block--out");
-const blockIn = document.querySelector(".block--in");
-
-const output = blockOut.querySelector(".select");
-const input = blockIn.querySelector(".select");
-
-
-const inputSend = blockOut.querySelector('.input')
-const inputGet = blockIn.querySelector('.input');
-console.log(inputGet, inputSend)
+sendSelect.addEventListener('change', (e) => {
+  sendCurrent = e.target.value;
+  renderGetSelect()
+  changeLink()
+  changeTitle()
+  fillInputs()
+})
 
 
-const defaultValue = output.value || 'BTC';
+getSelect.addEventListener('change', (e) => {
+  getCurrent = e.target.value;
+  renderSendSelect()
+  changeLink()
+  changeTitle()
+  fillInputs()
+})
+
+reverse.addEventListener('click', () => {
+  const tempGetSelect = getCurrent;
+  getCurrent = sendCurrent;
+  sendCurrent = tempGetSelect;
+  console.log('out: ' + sendCurrent)
+  console.log('get: ' + getCurrent)
+  const tempGetInput = getInput.value;
+  getInput.value = sendInput.value;
+  sendInput.value = tempGetInput
+
+  renderGetSelect()
+  renderSendSelect()
+  changeLink()
+  changeTitle()
+  fillInputs()
+})
+
+getInput.addEventListener('input', (e) => {
+  if(typeof +e.target.value != 'number') return
+  sendInput.value = +data[getCurrent][sendCurrent].curs_out * getInput.value;
+})
+
+sendInput.addEventListener('input', (e) => {
+  if(typeof +e.target.value != 'number') return
+  getInput.value = sendInput.value * data[sendCurrent][getCurrent].curs_out;
+})
 
 
-let couple = {
-    out: defaultValue,
-    in: ''
-}
-
-
-
-function getList(val) {
-  return data[val];
-}
-
-function setList(source, target) {
-    let selectedValOut, selectedValIn;
-
-    selectedValOut = [...source.options].filter(option => option.selected)[0].value
-    selectedValIn = [...target.options].filter(option => option.selected)[0].value
-    console.log(selectedValOut, selectedValIn)
-    
-  let currencyList = data[source.value]
-  console.log(currencyList)
-  let selectedIndex = 0;
-  target.innerHTML = "";
-  const arrOfCurrency = Object.keys(currencyList);
-  arrOfCurrency.forEach((curr, i) => {
-    if(typeof currencyList[curr] != 'object') return
-    const option = document.createElement("option");
+function renderGetSelect(){
+  const currencies = data[sendCurrent];
+  getSelect.innerHTML = '';
+  Object.keys(currencies).forEach((curr, i) => {
+    if(typeof currencies[curr] != 'object') return 
+    const option = document.createElement('option');
     option.value = curr;
     option.innerText = curr;
-    if(curr === selectedValIn){
-        selectedIndex = i;
+    getSelect.appendChild(option)
+    if(curr == getCurrent){
+      [...getSelect.options][i].selected = true;
     }
-    target.appendChild(option);
-  });
-  source.options
-  target.options[selectedIndex].selected = true;
-  couple.out = output.value;
-  couple.in = input.value;
+  })
 }
-
-function firstRender(){
-    let currencyList = data[defaultValue];
-    let selectedIndex = 0;
-    input.innerHTML = "";
-    const arrOfCurrency = Object.keys(currencyList);
-    arrOfCurrency.forEach((curr, i) => {
-      const option = document.createElement("option");
-      option.value = curr;
-      option.innerText = curr;
-      input.appendChild(option);
-    });
-    input.options[selectedIndex].selected = true;
-    couple.in = input.value;
-    console.log(couple)
+function renderSendSelect(){
+  const currencies = data[getCurrent];
+  sendSelect.innerHTML = '';
+  Object.keys(currencies).forEach((curr, i) => {
+    if(typeof currencies[curr] != 'object') return
+    const option = document.createElement('option');
+    option.value = curr;
+    option.innerText = curr;
+    sendSelect.appendChild(option)
+    if(curr == sendCurrent){
+      [...sendSelect.options][i].selected = true;
+    }
+  })
 }
-
 function fillInputs(){
-    inputGet.value = +inputSend.value * data[couple.out][couple.in]['curs_in']
-    console.log(data[couple.out][couple.in]['curs_in'])
+  sendInput.value = !+sendInput.value ? 1 : data[sendCurrent][getCurrent].curs_in
+  getInput.value = sendInput.value * data[sendCurrent][getCurrent].curs_out
+}
+function changeLink(){
+  link.innerText = `Обменять ${sendCurrent} на ${getCurrent}`;
+  link.href = `https://bitcoin24.comua/${sendCurrent}-to-${getCurrent}`
+}
+function changeTitle(){
+  titleSend.innerText = `Отправить, ${sendCurrent}`;
+  titleGet.innerText = `Получить, ${getCurrent}`;
 }
 
 
-output.addEventListener("change", (e) => {
-  setList(e.target, input);
-  console.log(couple)
-});
-input.addEventListener("change", (e) => {
-  setList(e.target, output);
-  console.log(couple)
-});
+function validateNumber(val){
+  if(typeof +val == 'number'){
+    return true
+  }
+}
 
-firstRender()
-setList(output, input);
+
+renderGetSelect()
+renderSendSelect()
 fillInputs()
-console.log(data);
+changeLink()
+changeTitle()
+
+console.log(data)

@@ -1,64 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
-    <title>Document</title>
-    <link rel="stylesheet" href="./style.css" />
-  </head>
-  <body>
-    <div class="container" id="converter">
-      <div class="block block--out">
-        <h3>
-          отправить, <span class="currency-name"></span>
-        </h3>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="row-1">
+      <div class="block">
+        <h3 class="title title--send"></h3>
         <div class="interactive">
-          <div class="output">
-            <input class="input" type="text" name="" id="" value="1" />
-          </div>
-          <select name="currency-out" class="select select--out">
-            <option value="BTC" >BTC</option>
+          <input class="input input--send" type="text"/>
+          <select name="currency-send" class="select select--send">
+            <option value="BTC">BTC</option>
             <option value="P24UAH">hrivna</option>
-            <option value="ETH">etherium</option>
+            <option value="ETH" selected>etherium</option>
             <option value="MONOBUAN">monobuan</option>
-            <option value="CARDUAH" selected>carduah</option>
+            <option value="CARDUAH">carduah</option>
             <option value="USDTERC20">USDTERC20</option>
             <option value="USDTTRC20">USDTTRC20</option>
           </select>
         </div>
       </div>
-      <div class="block block--in">
-        <h3>
-          получить, <span class="currency-name"></span>
-        </h3>
+    <button class="reverse">reverse</button>
+
+      <div class="block">
+        <h3 class="title title--get"></h3>
         <div class="interactive">
-          <div class="output">
-            <input class="input" type="text" name="" id="" />
-          </div>
-          <select name="currency-in" class="select select--in">
-            <!-- <option value="BTC" >BTC</option>
-            <option value="P24UAH" >hrivna</option>
-            <option value="ETH">etherium</option>
-            <option value="MONOBUAN" selected>monobuan</option>
-            <option value="CARDUAH">carduah</option>
-            <option value="USDTERC20">USDTERC20</option>
-            <option value="USDTTRC20">USDTTRC20</option> -->
-          </select>
+            <input class="input input--get" type="text"/>
+          <select name="currency-in" class="select select--get"></select>
         </div>
-      </div>
-      <div class="link">
-        <a href="#">обменять что-то на что-то</a>
       </div>
     </div>
 
-    <script
-        src="https://code.jquery.com/jquery-3.6.3.min.js"
-        integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
-        crossorigin="anonymous"></script>
-    <script src="./script.js" type="module"></script>
-  </body>
+
+    <a class="link" href="#">обменять что-то на что-то</a>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+  <script src="./script.js" type="module"></script>
+</body>
+
 </html>
