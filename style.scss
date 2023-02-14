@@ -1,75 +1,155 @@
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .row-1 {
+$bgColor: #f4f4f4;
+$textColor: #295465;
+$linkColor: #147c68;
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap");
+body {
+    background-color: $bgColor;
+}
+.converter {
+    padding: 3% 4%;
+    text-align: center;
+    &__row {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        .block {
-            width: 100%;
-            .interactive {
-                display: flex;
-                width: 100%;
-                .input{
-                    padding: 3%;
-                }
-                .select{
-                    &--get{
-                        background-color: rgb(93, 192, 93);
-                    }
-                    &--send {
-                        background: rgb(230, 92, 87);
-                    }
-                }
-            }
-            .title{
-                text-transform: uppercase;
-                color: rgb(19, 90, 90);
-                font-weight: bold;
-                font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-            }
-        }
     }
-   
-    .link {
-        white-space: nowrap;
-        margin-top: 25%;
-        color: white;
-        text-transform: uppercase;
-        text-decoration: none;
-        font-weight: bold;
-        background-color: rgb(19, 90, 90);
-        padding: 3%;
+    &__btn-reverse {
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 60px;
+        margin-bottom: 40px;
+    }
+    &__link {
+        border: 0;
+        background: $linkColor;
+        color: #fff;
+        font-size: 30px;
         border-radius: 5px;
+        display: block;
+        max-width: 350px;
+        margin: 25px auto;
+        font-family: "Roboto Condensed", sans-serif;
+        font-weight: bold;
         text-align: center;
-        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    }
-    .reverse{
-        width: 30%;
-        margin-top: 20%;
-        margin-bottom: 20%;
-        background-color: rgb(94, 171, 216);
-        border: none;
-        padding: 3%;
-        color: rgb(6, 56, 131);
-        font-size: 1em;
-        font-weight: bold;
-        border-radius: 5px;
+        padding: 5px 30px;
+        box-shadow: 0 2px 3px rgb(0 0 0 / 50%);
+        text-decoration: none;
     }
 }
 
-@media (min-width: 1024px) {
-    .container {
-        width: 40%;
-        margin-left: auto;
-        margin-right: auto;
-        .link{
-            margin-top: 5%;
-        }
-        }
-        
+.converter-block {
+    &__title {
+        color: $textColor;
+        text-transform: uppercase;
+        font-size: 35px;
+        text-align: center;
+        font-family: "Roboto Condensed", sans-serif;
+        font-weight: bold;
     }
+}
 
+.currency-field {
+    width: 100%;
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0px 0px 3px rgb(0 0 0 / 40%);
+    position: relative;
+    &__input {
+        flex-grow: 2;
+        width: 90%;
+        font-weight: bold;
+        font-size: 32px;
+        padding: 0 65px 0 15px;
 
+        color: #f7931a;
+        border: 1px solid #cdcdcd;
+        &--get {
+            color: $linkColor;
+        }
+    }
+    &__select {
+        width: 15vw;
+        aspect-ratio: 1/1;
+        border: none;
+        outline: none;
+        border: 1px solid #cdcdcd;
+        border-left: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+    &__select::-ms-expand {
+        display: none;
+      }
+
+    &__items{
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        margin: 0;
+        padding: 0;
+        flex-direction: column;
+        z-index: 0;
+        transition: all .3s ease-in-out;
+        input{
+            display: none;
+        }
+        label{
+            transition: all .3s ease-in-out;
+            transform: translateY(-100%);
+            opacity: 0;
+
+        }
+        label:first-of-type{
+            transform: none;
+            opacity: 1;
+        }
+    }
+    &__items.open{
+        max-height: 100vw;
+        label{
+            transform: none;
+            opacity: 1;
+        }
+    }
+    &__item{
+        width: 15vw;
+        aspect-ratio: 1/1;
+        border:1px solid black;
+        &--monobuah{
+            background-color: blue;
+        }
+        &--carduah{
+            background-color: rgb(0, 255, 13);
+        }
+        &--p24uah{
+            background-color: rgb(191, 255, 0);
+        }
+        &--usdttrc20{
+            background-color: rgb(59, 195, 207);
+        }
+    }
+    &__hidden-btn{
+        position: absolute;
+        width: 15vw;
+        aspect-ratio: 1/1;
+        top: 0;
+        right: 0;
+        background-color: transparent;
+        z-index: 5;
+        border:none;
+        outline: none;
+        border:4px solid rgb(31, 232, 199);
+    }
+}
+
+.btn-reverse {
+    width: 18vw;
+    aspect-ratio: 1/1;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url("./static/img/obmen.png");
+    background-color: transparent;
+    border: none;
+}

@@ -1,18 +1,45 @@
-const sendSelect = document.querySelector('.select--send');
-const getSelect = document.querySelector('.select--get');
-const sendInput = document.querySelector('.input--send');
-const getInput = document.querySelector('.input--get');
-const link = document.querySelector('.link')
-const titleGet = document.querySelector('.title--get');
-const titleSend = document.querySelector('.title--send');
-const nameMap = {
-}
+const sendSelect = document.querySelector("#send-select");
+const getSelect = document.querySelector("#get-select");
+const sendInput = document.querySelector(
+  ".currency-field__input"
+);
+const getInput = document.querySelector(
+  ".currency-field__input"
+);
+const link = document.querySelector(".converter__link");
+const titleGet = document.querySelector(
+  ".converter-block__title--get"
+);
+const titleSend = document.querySelector(
+  ".converter-block__title--send"
+);
+const reverse = document.querySelector(
+  ".converter__btn-reverse"
+);
+
+const sendList = document.querySelector(
+  ".currency-field__list--send"
+);
+const getList = document.querySelector(
+  ".currency-field__list--get"
+);
 
 
-let sendCurrent = sendSelect.value || 'BTC';
-let getCurrent = getSelect.value || 'P24UAH';
+const hiddenBtns = document.querySelectorAll('.currency-field__hidden-btn');
 
-const reverse = document.querySelector('.reverse')
+hiddenBtns.forEach(btn => {btn.onclick = (e) => {
+    if(e.target.getAttribute('data-type') === 'send'){
+        const sendItemsList = document.querySelector('.currency-field__items--send')
+        sendItemsList.classList.toggle('open');
+        return
+    }
+    const getItemsList = document.querySelector('.currency-field__items--get')
+    getItemsList.classList.toggle('open')
+}})
+const nameMap = {};
+
+let sendCurrent = sendSelect.value || "BTC";
+let getCurrent = getSelect.value || "MONOBUAH";
 
 let data = {
   P24UAH: {
@@ -361,104 +388,159 @@ let data = {
   time_up: "1676215687",
 };
 
-sendSelect.addEventListener('change', (e) => {
+sendSelect.addEventListener("change", (e) => {
   sendCurrent = e.target.value;
-  renderGetSelect()
-  changeLink()
-  changeTitle()
-  fillInputs()
-})
+  renderGetSelect();
+  changeLink();
+  changeTitle();
+  fillInputs();
+});
 
-
-getSelect.addEventListener('change', (e) => {
+getSelect.addEventListener("change", (e) => {
   getCurrent = e.target.value;
-  renderSendSelect()
-  changeLink()
-  changeTitle()
-  fillInputs()
-})
+  renderSendSelect();
+  changeLink();
+  changeTitle();
+  fillInputs();
+});
 
-reverse.addEventListener('click', () => {
+reverse.addEventListener("click", () => {
   const tempGetSelect = getCurrent;
   getCurrent = sendCurrent;
   sendCurrent = tempGetSelect;
-  console.log('out: ' + sendCurrent)
-  console.log('get: ' + getCurrent)
+
   const tempGetInput = getInput.value;
   getInput.value = sendInput.value;
-  sendInput.value = tempGetInput
+  sendInput.value = tempGetInput;
 
-  renderGetSelect()
-  renderSendSelect()
-  changeLink()
-  changeTitle()
-  fillInputs()
-})
+  renderGetSelect();
+  renderSendSelect();
+  changeLink();
+  changeTitle();
+  fillInputs();
+});
 
-getInput.addEventListener('input', (e) => {
-  if(typeof +e.target.value != 'number') return
-  sendInput.value = +data[getCurrent][sendCurrent].curs_out * getInput.value;
-})
+getInput.addEventListener("input", (e) => {
+  console.log("change");
+  if (typeof +e.target.value != "number") return;
+  sendInput.value =
+    +data[getCurrent][sendCurrent].curs_out *
+    getInput.value;
+});
 
-sendInput.addEventListener('input', (e) => {
-  if(typeof +e.target.value != 'number') return
-  getInput.value = sendInput.value * data[sendCurrent][getCurrent].curs_out;
-})
+sendInput.addEventListener("input", (e) => {
+  console.log("change");
+  if (typeof +e.target.value != "number") return;
+  getInput.value =
+    sendInput.value *
+    data[sendCurrent][getCurrent].curs_out;
+});
 
-
-function renderGetSelect(){
+function renderGetSelect() {
   const currencies = data[sendCurrent];
-  getSelect.innerHTML = '';
+  getSelect.innerHTML = "";
   Object.keys(currencies).forEach((curr, i) => {
-    if(typeof currencies[curr] != 'object') return 
-    const option = document.createElement('option');
+    if (typeof currencies[curr] != "object") return;
+    const option = document.createElement("option");
     option.value = curr;
+    option.classList.add('currency-field__item')
     option.innerText = curr;
-    getSelect.appendChild(option)
-    if(curr == getCurrent){
+    getSelect.appendChild(option);
+    if (curr == getCurrent) {
       [...getSelect.options][i].selected = true;
     }
-  })
+  });
 }
-function renderSendSelect(){
+function renderRadioSelectSend() {
   const currencies = data[getCurrent];
-  sendSelect.innerHTML = '';
+  sendList.innerHTML = "";
+  const ul = document.createElement("ul");
+  ul.classList.add('currency-field__items');
+  ul.classList.add('currency-field__items--send');
   Object.keys(currencies).forEach((curr, i) => {
-    if(typeof currencies[curr] != 'object') return
-    const option = document.createElement('option');
+    if (typeof currencies[curr] != "object") return;
+    const input = document.createElement("input");
+    const label = document.createElement("label");
+    input.type = "radio";
+    input.value = curr;
+    input.name = "send-currency";
+    input.id = curr.toLocaleLowerCase();
+    input.checked = curr === sendCurrent;
+    label.setAttribute('for', curr.toLocaleLowerCase())
+    label.classList.add('currency-field__item')
+    label.classList.add(`currency-field__item--${curr.toLocaleLowerCase()}`)
+    ul.appendChild(input);
+    ul.appendChild(label);
+    // if (curr == getCurrent) {
+    //   //   [...getSelect.options][i].selected = true;
+    // }
+  });
+  sendList.appendChild(ul)
+}
+function renderRadioSelectGet() {
+  const currencies = data[sendCurrent];
+  getList.innerHTML = "";
+  const ul = document.createElement("ul");
+  ul.classList.add('currency-field__items');
+  ul.classList.add('currency-field__items--get');
+  Object.keys(currencies).forEach((curr, i) => {
+    if (typeof currencies[curr] != "object") return;
+    const input = document.createElement("input");
+    const label = document.createElement("label");
+    input.type = "radio";
+    input.value = curr;
+    input.name = "get-currency";
+    input.id = curr.toLocaleLowerCase();
+    input.checked = curr === getCurrent;
+    label.setAttribute('for', curr.toLocaleLowerCase())
+    label.classList.add('currency-field__item')
+    label.classList.add(`currency-field__item--${curr.toLocaleLowerCase()}`)
+    ul.appendChild(input);
+    ul.appendChild(label);
+    // if (curr == getCurrent) {
+    //   //   [...getSelect.options][i].selected = true;
+    // }
+  });
+  getList.appendChild(ul)
+}
+function renderSendSelect() {
+  const currencies = data[getCurrent];
+  sendSelect.innerHTML = "";
+  Object.keys(currencies).forEach((curr, i) => {
+    if (typeof currencies[curr] != "object") return;
+    const option = document.createElement("option");
     option.value = curr;
     option.innerText = curr;
-    sendSelect.appendChild(option)
-    if(curr == sendCurrent){
+    sendSelect.appendChild(option);
+    if (curr == sendCurrent) {
       [...sendSelect.options][i].selected = true;
     }
-  })
+  });
 }
-function fillInputs(){
-  sendInput.value = !+sendInput.value ? 1 : data[sendCurrent][getCurrent].curs_in
-  getInput.value = sendInput.value * data[sendCurrent][getCurrent].curs_out
+function fillInputs() {
+  sendInput.value = !+sendInput.value
+    ? 1
+    : +data[sendCurrent][getCurrent].curs_in;
+
+  getInput.value =
+    +sendInput.value *
+    +data[sendCurrent][getCurrent].curs_out;
 }
-function changeLink(){
+function changeLink() {
   link.innerText = `Обменять ${sendCurrent} на ${getCurrent}`;
-  link.href = `https://bitcoin24.comua/${sendCurrent}-to-${getCurrent}`
+  link.href = `https://bitcoin24.comua/${sendCurrent}-to-${getCurrent}`;
 }
-function changeTitle(){
+function changeTitle() {
   titleSend.innerText = `Отправить, ${sendCurrent}`;
   titleGet.innerText = `Получить, ${getCurrent}`;
 }
 
+renderGetSelect();
+renderSendSelect();
+fillInputs();
+changeLink();
+changeTitle();
+renderRadioSelectGet()
+renderRadioSelectSend()
 
-function validateNumber(val){
-  if(typeof +val == 'number'){
-    return true
-  }
-}
-
-
-renderGetSelect()
-renderSendSelect()
-fillInputs()
-changeLink()
-changeTitle()
-
-console.log(data)
+console.log(data);

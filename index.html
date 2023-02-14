@@ -1,50 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
-
-<body>
-  <div class="container">
-    <div class="row-1">
-      <div class="block">
-        <h3 class="title title--send"></h3>
-        <div class="interactive">
-          <input class="input input--send" type="text"/>
-          <select name="currency-send" class="select select--send">
-            <option value="BTC">BTC</option>
+  <body>
+    <div class="converter">
+      <div class="converter__row">
+        <div class="converter-block">
+          <h3
+            class="converter-block__title converter-block__title--send"
+          ></h3>
+          <div class="currency-field">
+            <input
+              class="currency-field__input currency-field__input--send"
+              type="text"
+            />
+            <div class="currency-field__list currency-field__list--send"></div>
+            <button class="currency-field__hidden-btn" data-type="send"></button>
+            <select
+              name="currency-send"
+              class="currency-field__select"
+              id="send-select"
+            >
+              <!-- <option value="BTC">BTC</option>
             <option value="P24UAH">hrivna</option>
             <option value="ETH" selected>etherium</option>
             <option value="MONOBUAN">monobuan</option>
             <option value="CARDUAH">carduah</option>
             <option value="USDTERC20">USDTERC20</option>
-            <option value="USDTTRC20">USDTTRC20</option>
-          </select>
+            <option value="USDTTRC20">USDTTRC20</option> -->
+            </select>
+          </div>
         </div>
-      </div>
-    <button class="reverse">reverse</button>
+        <button class="btn-reverse converter__btn-reverse">
+        </button>
 
-      <div class="block">
-        <h3 class="title title--get"></h3>
-        <div class="interactive">
-            <input class="input input--get" type="text"/>
-          <select name="currency-in" class="select select--get"></select>
+        <div class="converter-block">
+          <h3
+            class="converter-block__title converter-block__title--get"
+          ></h3>
+          <div class="currency-field">
+            <input
+              class="currency-field__input currency-field__input--get"
+              type="text"
+            />
+            <div class="currency-field__list currency-field__list--get">
+                
+            </div>
+            <button class="currency-field__hidden-btn" data-type="get"></button>
+            <select
+              name="currency-send"
+              class="currency-field__select"
+              id="get-select"
+            ></select>
+          </div>
         </div>
       </div>
+
+      <a class="converter__link" href="#"
+        >обменять что-то на что-то</a
+      >
     </div>
 
-
-    <a class="link" href="#">обменять что-то на что-то</a>
-  </div>
-
-  <script src="https://code.jquery.com/jquery-3.6.3.min.js"
-    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
-  <script src="./script.js" type="module"></script>
-</body>
-
+    <script
+      src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+      crossorigin="anonymous"
+    ></script>
+    <script src="./script.js" type="module"></script>
+  </body>
 </html>
