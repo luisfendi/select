@@ -499,7 +499,7 @@ function renderRadioSelectGet() {
     const input = document.createElement("input");
     const label = document.createElement("label");
     label.innerHTML = `
-      <span class="currency-field__item-title">${mapName[curr].title}</span>
+      <p class="currency-field__item-title">${mapName[curr].title}</p>
     `
     input.type = "radio";
     input.value = curr;

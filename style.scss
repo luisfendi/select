@@ -71,6 +71,7 @@ body {
         border: 1px solid #cdcdcd;
         border: none;
         outline: none;
+        z-index: 8;
         &--get {
             color: $linkColor;
         }
@@ -184,13 +185,17 @@ body {
         display: block;
        margin-top: auto;
        transform: translateX(-100%);
-    //    position: absolute;
-       bottom: 0;
+       position: absolute;
+       top: 1px;
        white-space: nowrap;
+       color: $linkColor;
        font-family: "Roboto Condensed", sans-serif;
        width: 200%;
-       max-height: 100%;
-       background-color: rgb(151, 151, 151);
+       height: 100%;
+       text-align: center;
+       background-color: rgb(212, 212, 212);
+       padding-top: 25%;
+       border-bottom: 1px solid rgba(0,0,0,0.4);
     }
     &__hidden-btn{
         position: absolute;
