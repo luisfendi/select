@@ -1,11 +1,10 @@
-// const sendSelect = document.querySelector("#send-select");
-// const getSelect = document.querySelector("#get-select");
+const sendSelect = document.querySelector("#send-select");
+const getSelect = document.querySelector("#get-select");
 const sendInput = document.querySelector(
-  ".currency-field__input--send"
+  ".currency-field__input"
 );
-let startSendSum = 2500;
 const getInput = document.querySelector(
-  ".currency-field__input--get"
+  ".currency-field__input"
 );
 const link = document.querySelector(".converter__link");
 const titleGet = document.querySelector(
@@ -17,12 +16,31 @@ const titleSend = document.querySelector(
 const reverse = document.querySelector(
   ".converter__btn-reverse"
 );
+
 const sendList = document.querySelector(
   ".currency-field__list--send"
 );
 const getList = document.querySelector(
   ".currency-field__list--get"
 );
+
+
+const hiddenBtns = document.querySelectorAll('.currency-field__hidden-btn');
+
+hiddenBtns.forEach(btn => {btn.onclick = (e) => {
+    if(e.target.getAttribute('data-type') === 'send'){
+        const sendItemsList = document.querySelector('.currency-field__items--send')
+        sendItemsList.classList.toggle('open');
+        return
+    }
+    const getItemsList = document.querySelector('.currency-field__items--get')
+    getItemsList.classList.toggle('open')
+}})
+const nameMap = {};
+
+let sendCurrent = sendSelect.value || "BTC";
+let getCurrent = getSelect.value || "MONOBUAH";
+
 let data = {
   P24UAH: {
     BTC: {
@@ -370,160 +388,53 @@ let data = {
   time_up: "1676215687",
 };
 
-const mapName = {
-  P24UAH: {title:'Приват24', url: 'privat24'},
-  MONOBUAH: {title: "Монобанк", url: 'monobuah'},
-  CARDUAH: {title: "Visa/Mastercard", url: 'carduah'},
-  BTC: {title: "Bitcoin", url: 'bitcoin'},
-  ETH: {title: "Etherium", url: 'etherium'},
-  USDTERC20: {title: "USDT", url: "usdterc20"},
-  USDTTRC20: {title: "TRC20 USDT", url: "usdttrc20"},
-  TRX: {title: "TRON", url: "trx"}
-}
-
-let sendCurrent = "P24UAH";
-let getCurrent = "BTC";
-
-
-
-renderRadioSelectGet()
-renderRadioSelectSend()
-resetStyle([...sendList.querySelectorAll('label')], sendCurrent, 'active')
-resetStyle([...getList.querySelectorAll('label')], getCurrent, 'active')
-
-const hiddenBtns = document.querySelectorAll('.currency-field__hidden-btn');
-hiddenBtns.forEach(btn => {
-  btn.onclick = (e) => {
-    if (e.target.getAttribute('data-type') === 'send') {
-      const sendItemsList = document.querySelector('.currency-field__items--send')
-      sendItemsList.classList.toggle('open');
-      return
-    }
-    const getItemsList = document.querySelector('.currency-field__items--get')
-    getItemsList.classList.toggle('open')
-  }
-})
-
-
-function listenSendRadio() {
-  let radioSend = sendList.querySelectorAll('input');
-  [...radioSend].forEach(input => {
-    input.addEventListener('input', (e) => {
-      sendCurrent = e.target.value;
-      resetStyle([...sendList.querySelectorAll('label')], sendCurrent, 'active');
-      sendList.querySelector('ul').classList.remove('open')
-      renderRadioSelectGet();
-      changeLink();
-      changeTitle();
-    })
-  });
-}
-
-
-function listenGetRadio() {
-  let radioGet = getList.querySelectorAll('input');
-  [...radioGet].forEach(input => {
-    input.addEventListener('input', (e) => {
-      getCurrent = e.target.value;
-      resetStyle([...getList.querySelectorAll('label')], getCurrent, 'active');
-      getList.querySelector('ul').classList.remove('open');
-      renderRadioSelectSend();
-      changeLink();
-      changeTitle();
-    })
-  });
-}
-
-
-reverse.addEventListener("click", () => {
-  [getCurrent, sendCurrent] = [sendCurrent, getCurrent];
-  renderRadioSelectGet()
-  renderRadioSelectSend()
+sendSelect.addEventListener("change", (e) => {
+  sendCurrent = e.target.value;
+  renderGetSelect();
   changeLink();
   changeTitle();
-  setGetValue(sendInput.value)
+  fillInputs();
 });
 
+getSelect.addEventListener("change", (e) => {
+  getCurrent = e.target.value;
+  renderSendSelect();
+  changeLink();
+  changeTitle();
+  fillInputs();
+});
 
+reverse.addEventListener("click", () => {
+  const tempGetSelect = getCurrent;
+  getCurrent = sendCurrent;
+  sendCurrent = tempGetSelect;
 
+  const tempGetInput = getInput.value;
+  getInput.value = sendInput.value;
+  sendInput.value = tempGetInput;
 
+  renderGetSelect();
+  renderSendSelect();
+  changeLink();
+  changeTitle();
+  fillInputs();
+});
 
+getInput.addEventListener("input", (e) => {
+  console.log("change");
+  if (typeof +e.target.value != "number") return;
+  sendInput.value =
+    +data[getCurrent][sendCurrent].curs_out *
+    getInput.value;
+});
 
-
-function renderRadioSelectSend() {
-  console.log('render send')
-  const currencies = data[getCurrent];
-  sendList.innerHTML = "";
-  const ul = document.createElement("ul");
-  ul.classList.add('currency-field__items');
-  ul.classList.add('currency-field__items--send');
-  Object.keys(currencies).forEach((curr, i) => {
-    if (typeof currencies[curr] != "object") return;
-    const input = document.createElement("input");
-    const label = document.createElement("label");
-    label.innerHTML = `
-      <span class="currency-field__item-title">${mapName[curr].title}</span>
-    `
-    input.type = "radio";
-    input.value = curr;
-    input.name = "send-currency";
-    input.id = `${curr.toLowerCase()}-send`;
-    input.checked = curr === sendCurrent;
-    label.setAttribute('for', `${curr.toLowerCase()}-send`)
-    label.classList.add('currency-field__item');
-    // label.innerText = curr
-    label.setAttribute('value', curr)
-    label.classList.add(`currency-field__item--${curr.toLowerCase()}`)
-    if (curr == sendCurrent) {
-      ul.prepend(label)
-      label.classList.add('active')
-    } else {
-      ul.appendChild(label);
-    }
-    ul.appendChild(input);
-  });
-  sendList.appendChild(ul);
-  listenGetRadio()
-  listenSendRadio()
-  setGetValue(sendInput.value)
-}
-
-function renderRadioSelectGet() {
-  const currencies = data[sendCurrent];
-  getList.innerHTML = "";
-  const ul = document.createElement("ul");
-  ul.classList.add('currency-field__items');
-  ul.classList.add('currency-field__items--get');
-  Object.keys(currencies).forEach((curr, i) => {
-    if (typeof currencies[curr] != "object") return;
-    const input = document.createElement("input");
-    const label = document.createElement("label");
-    label.innerHTML = `
-      <span class="currency-field__item-title">${mapName[curr].title}</span>
-    `
-    input.type = "radio";
-    input.value = curr;
-    input.name = "get-currency";
-    input.id = `${curr.toLowerCase()}-get`;
-    input.checked = curr === getCurrent;
-    label.setAttribute('for', `${curr.toLowerCase()}-get`)
-    label.setAttribute('value', curr)
-    label.classList.add('currency-field__item')
-    // label.innerText = curr
-    label.classList.add(`currency-field__item--${curr.toLowerCase()}`)
-    if (curr == getCurrent) {
-      ul.prepend(label)
-      label.classList.add('active')
-    } else {
-      ul.appendChild(label);
-    }
-    ul.appendChild(input);
-  });
-  getList.appendChild(ul)
-  listenSendRadio()
-  listenGetRadio()
-  setSendValue(getInput.value)
-}
+sendInput.addEventListener("input", (e) => {
+  console.log("change");
+  if (typeof +e.target.value != "number") return;
+  getInput.value =
+    sendInput.value *
+    data[sendCurrent][getCurrent].curs_out;
+});
 
 function renderGetSelect() {
   const currencies = data[sendCurrent];
@@ -540,7 +451,58 @@ function renderGetSelect() {
     }
   });
 }
-
+function renderRadioSelectSend() {
+  const currencies = data[getCurrent];
+  sendList.innerHTML = "";
+  const ul = document.createElement("ul");
+  ul.classList.add('currency-field__items');
+  ul.classList.add('currency-field__items--send');
+  Object.keys(currencies).forEach((curr, i) => {
+    if (typeof currencies[curr] != "object") return;
+    const input = document.createElement("input");
+    const label = document.createElement("label");
+    input.type = "radio";
+    input.value = curr;
+    input.name = "send-currency";
+    input.id = curr.toLocaleLowerCase();
+    input.checked = curr === sendCurrent;
+    label.setAttribute('for', curr.toLocaleLowerCase())
+    label.classList.add('currency-field__item')
+    label.classList.add(`currency-field__item--${curr.toLocaleLowerCase()}`)
+    ul.appendChild(input);
+    ul.appendChild(label);
+    // if (curr == getCurrent) {
+    //   //   [...getSelect.options][i].selected = true;
+    // }
+  });
+  sendList.appendChild(ul)
+}
+function renderRadioSelectGet() {
+  const currencies = data[sendCurrent];
+  getList.innerHTML = "";
+  const ul = document.createElement("ul");
+  ul.classList.add('currency-field__items');
+  ul.classList.add('currency-field__items--get');
+  Object.keys(currencies).forEach((curr, i) => {
+    if (typeof currencies[curr] != "object") return;
+    const input = document.createElement("input");
+    const label = document.createElement("label");
+    input.type = "radio";
+    input.value = curr;
+    input.name = "get-currency";
+    input.id = curr.toLocaleLowerCase();
+    input.checked = curr === getCurrent;
+    label.setAttribute('for', curr.toLocaleLowerCase())
+    label.classList.add('currency-field__item')
+    label.classList.add(`currency-field__item--${curr.toLocaleLowerCase()}`)
+    ul.appendChild(input);
+    ul.appendChild(label);
+    // if (curr == getCurrent) {
+    //   //   [...getSelect.options][i].selected = true;
+    // }
+  });
+  getList.appendChild(ul)
+}
 function renderSendSelect() {
   const currencies = data[getCurrent];
   sendSelect.innerHTML = "";
@@ -555,50 +517,30 @@ function renderSendSelect() {
     }
   });
 }
-
 function fillInputs() {
-  sendInput.value = startSendSum;
-  getInput.value = +(startSendSum / data[sendCurrent][getCurrent].curs_in).toFixed(8);
+  sendInput.value = !+sendInput.value
+    ? 1
+    : +data[sendCurrent][getCurrent].curs_in;
+
+  getInput.value =
+    +sendInput.value *
+    +data[sendCurrent][getCurrent].curs_out;
 }
-
-
 function changeLink() {
-  link.innerText = `Обменять ${mapName[sendCurrent].title} на ${mapName[getCurrent].title}`;
-  link.href = `https://bitcoin24.comua/${mapName[sendCurrent].url}-to-${mapName[getCurrent].url}`;
+  link.innerText = `Обменять ${sendCurrent} на ${getCurrent}`;
+  link.href = `https://bitcoin24.comua/${sendCurrent}-to-${getCurrent}`;
 }
-
 function changeTitle() {
-  titleSend.innerText = `Отправить,  ${mapName[sendCurrent].title}`;
-  titleGet.innerText = `Получить, ${mapName[getCurrent].title}`;
+  titleSend.innerText = `Отправить, ${sendCurrent}`;
+  titleGet.innerText = `Получить, ${getCurrent}`;
 }
 
-function resetStyle(arr, target, selector) {
-  arr.forEach((el) => {
-    if (el.getAttribute('value') == target) {
-      el.classList.add(selector)
-    } else {
-      el.classList.remove(selector)
-    }
-  })
-}
-
-
-function setSendValue(val){
-  sendInput.value = +(val * data[getCurrent][sendCurrent].curs_out).toFixed(8)
-}
-
-function setGetValue(val){
-  getInput.value = +(val / data[sendCurrent][getCurrent].curs_in).toFixed(8);
-}
-getInput.addEventListener("input", (e) => setSendValue(e.target.value));
-sendInput.addEventListener("input", (e) => setGetValue(e.target.value));
-
-
-// renderGetSelect();
-// renderSendSelect();
+renderGetSelect();
+renderSendSelect();
 fillInputs();
 changeLink();
 changeTitle();
-
+renderRadioSelectGet()
+renderRadioSelectSend()
 
 console.log(data);
