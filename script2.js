@@ -421,14 +421,13 @@ reverse.addEventListener("click", () => {
 
 //функция рендера радио инпутов "отправить" после изменения в поле "Получить"
 function renderRadioSelectSend() {
-  const currencies = Object.keys(data).filter(curr => curr != getCurrent)
+  const currencies = data[getCurrent];
   sendList.innerHTML = "";
   const ul = document.createElement("ul");
   ul.classList.add("currency-field__items");
   ul.classList.add("currency-field__items--send");
-  currencies.forEach((curr, i) => {
-    
-    if (typeof data[curr] != "object") return;
+  Object.keys(currencies).forEach((curr, i) => {
+    if (typeof currencies[curr] != "object") return;
     const input = document.createElement("input");
     const label = document.createElement("label");
     label.innerHTML = `
@@ -438,8 +437,8 @@ function renderRadioSelectSend() {
     input.value = curr;
     input.name = "send-currency";
     input.id = `${curr.toLowerCase()}-send`;
+    input.disabled = !(+currencies[curr].res);
     input.checked = curr === sendCurrent;
-    input.disabled = !isAbleToExchange(curr)
     input.disabled ? label.classList.add('disabled') : null
     label.setAttribute("for", `${curr.toLowerCase()}-send`);
     label.classList.add("currency-field__item");
@@ -459,19 +458,10 @@ function renderRadioSelectSend() {
   listenGetRadio();
   listenSendRadio(); 
   setGetInput()
-
-
-  function isAbleToExchange(curr){
-    return Object.keys(data[curr]).some(target => +data[curr][target].res)
-  }
 }
 
 //функция рендера радио инпутов "Получить" после изменения в поле "Отправить"
 function renderRadioSelectGet() {
-  if(!data[sendCurrent][getCurrent]){
-    getCurrent = Object.keys(data[sendCurrent])[0];
-    renderRadioSelectSend()
-  }
   const currencies = data[sendCurrent];
   getList.innerHTML = "";
   const ul = document.createElement("ul");
@@ -508,7 +498,6 @@ function renderRadioSelectGet() {
   getList.appendChild(ul);
   listenSendRadio();
   listenGetRadio();
-  
   setGetInput()
 }
 
