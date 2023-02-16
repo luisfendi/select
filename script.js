@@ -1,28 +1,5 @@
-// const sendSelect = document.querySelector("#send-select");
-// const getSelect = document.querySelector("#get-select");
-const sendInput = document.querySelector(
-  ".currency-field__input--send"
-);
-let startSendSum = 2500;
-const getInput = document.querySelector(
-  ".currency-field__input--get"
-);
-const link = document.querySelector(".converter__link");
-const titleGet = document.querySelector(
-  ".converter-block__title--get"
-);
-const titleSend = document.querySelector(
-  ".converter-block__title--send"
-);
-const reverse = document.querySelector(
-  ".converter__btn-reverse"
-);
-const sendList = document.querySelector(
-  ".currency-field__list--send"
-);
-const getList = document.querySelector(
-  ".currency-field__list--get"
-);
+// import data from './data';
+//если без сборщиков модулей то объявляем/получаем в этом же файле
 let data = {
   P24UAH: {
     BTC: {
@@ -370,235 +347,267 @@ let data = {
   time_up: "1676215687",
 };
 
+const sendInput = document.querySelector( ".currency-field__input--send");
+const getInput = document.querySelector(".currency-field__input--get");
+const link = document.querySelector(".converter__link");
+const titleGet = document.querySelector( ".converter-block__title--get");
+const titleSend = document.querySelector(".converter-block__title--send");
+const reverse = document.querySelector(".converter__btn-reverse");
+const sendList = document.querySelector(".currency-field__list--send");
+const getList = document.querySelector(".currency-field__list--get");
+
+//имена - ссылки
 const mapName = {
-  P24UAH: {title:'Приват24', url: 'privat24'},
-  MONOBUAH: {title: "Монобанк", url: 'monobuah'},
-  CARDUAH: {title: "Visa/Mastercard", url: 'carduah'},
-  BTC: {title: "Bitcoin", url: 'bitcoin'},
-  ETH: {title: "Etherium", url: 'etherium'},
-  USDTERC20: {title: "USDT", url: "usdterc20"},
-  USDTTRC20: {title: "TRC20 USDT", url: "usdttrc20"},
-  TRX: {title: "TRON", url: "trx"}
-}
+  P24UAH: { title: "Приват24", url: "privat24" },
+  MONOBUAH: { title: "Монобанк", url: "monobuah" },
+  CARDUAH: { title: "Visa/Mastercard", url: "carduah" },
+  BTC: { title: "Bitcoin", url: "bitcoin" },
+  ETH: { title: "Etherium", url: "etherium" },
+  USDTERC20: { title: "USDT", url: "usdterc20" },
+  USDTTRC20: { title: "TRC20 USDT", url: "usdttrc20" },
+  TRX: { title: "TRON", url: "trx" },
+};
 
-let sendCurrent = "P24UAH";
-let getCurrent = "BTC";
+let sendCurrent = "P24UAH"; //дефолтная валюта отправить
+let getCurrent = "BTC";     //дефолтная валюта получить
+let startSendSum = 2500;    //дефотное значение для P24UAH
+let reversed = false; //для корректной работы калькулятора индикатор, была ли смена инпутов
 
+renderRadioSelectGet();
+renderRadioSelectSend();
+resetStyle(
+  [...sendList.querySelectorAll("label")],
+  sendCurrent,
+  "active"
+);
+resetStyle(
+  [...getList.querySelectorAll("label")],
+  getCurrent,
+  "active"
+);
 
-
-renderRadioSelectGet()
-renderRadioSelectSend()
-resetStyle([...sendList.querySelectorAll('label')], sendCurrent, 'active')
-resetStyle([...getList.querySelectorAll('label')], getCurrent, 'active')
-
-const hiddenBtns = document.querySelectorAll('.currency-field__hidden-btn');
-hiddenBtns.forEach(btn => {
+const hiddenBtns = document.querySelectorAll(
+  ".currency-field__hidden-btn"
+);
+hiddenBtns.forEach((btn) => {
   btn.onclick = (e) => {
-    if (e.target.getAttribute('data-type') === 'send') {
-      const sendItemsList = document.querySelector('.currency-field__items--send')
-      sendItemsList.classList.toggle('open');
-      return
+    if (e.target.getAttribute("data-type") === "send") {
+      const sendItemsList = document.querySelector(".currency-field__items--send");
+      sendItemsList.classList.toggle("open");
+      return;
     }
-    const getItemsList = document.querySelector('.currency-field__items--get')
-    getItemsList.classList.toggle('open')
-  }
-})
-
-
-function listenSendRadio() {
-  let radioSend = sendList.querySelectorAll('input');
-  [...radioSend].forEach(input => {
-    input.addEventListener('input', (e) => {
-      sendCurrent = e.target.value;
-      resetStyle([...sendList.querySelectorAll('label')], sendCurrent, 'active');
-      sendList.querySelector('ul').classList.remove('open')
-      renderRadioSelectGet();
-      changeLink();
-      changeTitle();
-    })
-  });
-}
-
-
-function listenGetRadio() {
-  let radioGet = getList.querySelectorAll('input');
-  [...radioGet].forEach(input => {
-    input.addEventListener('input', (e) => {
-      getCurrent = e.target.value;
-      resetStyle([...getList.querySelectorAll('label')], getCurrent, 'active');
-      getList.querySelector('ul').classList.remove('open');
-      renderRadioSelectSend();
-      changeLink();
-      changeTitle();
-    })
-  });
-}
-
-
-reverse.addEventListener("click", () => {
-  [getCurrent, sendCurrent] = [sendCurrent, getCurrent];
-  renderRadioSelectGet()
-  renderRadioSelectSend()
-  changeLink();
-  changeTitle();
-  setGetValue(sendInput.value)
+    const getItemsList = document.querySelector(
+      ".currency-field__items--get"
+    );
+    getItemsList.classList.toggle("open");
+  };
 });
 
+let readyForReverse = true;
+reverse.addEventListener("click", () => {
+  if(readyForReverse){
+  readyForReverse = false;
+  sendInput.value = +getInput.value;
+  reversed = !reversed;
+  [getCurrent, sendCurrent] = [sendCurrent, getCurrent];
+  renderRadioSelectGet();
+  renderRadioSelectSend();
+  changeLink();
+  changeTitle();
+  readyForReverse = true
+  return
+  }
+});
 
-
-
-
-
-
+//функция рендера радио инпутов "отправить" после изменения в поле "Получить"
 function renderRadioSelectSend() {
-  console.log('render send')
   const currencies = data[getCurrent];
   sendList.innerHTML = "";
   const ul = document.createElement("ul");
-  ul.classList.add('currency-field__items');
-  ul.classList.add('currency-field__items--send');
+  ul.classList.add("currency-field__items");
+  ul.classList.add("currency-field__items--send");
   Object.keys(currencies).forEach((curr, i) => {
     if (typeof currencies[curr] != "object") return;
     const input = document.createElement("input");
     const label = document.createElement("label");
     label.innerHTML = `
       <span class="currency-field__item-title">${mapName[curr].title}</span>
-    `
+    `;
     input.type = "radio";
     input.value = curr;
     input.name = "send-currency";
     input.id = `${curr.toLowerCase()}-send`;
+    input.disabled = !(+currencies[curr].res);
     input.checked = curr === sendCurrent;
-    label.setAttribute('for', `${curr.toLowerCase()}-send`)
-    label.classList.add('currency-field__item');
-    // label.innerText = curr
-    label.setAttribute('value', curr)
-    label.classList.add(`currency-field__item--${curr.toLowerCase()}`)
+    input.disabled ? label.classList.add('disabled') : null
+    label.setAttribute("for", `${curr.toLowerCase()}-send`);
+    label.classList.add("currency-field__item");
+    label.setAttribute("value", curr);
+    label.classList.add(
+      `currency-field__item--${curr.toLowerCase()}`
+    );
     if (curr == sendCurrent) {
-      ul.prepend(label)
-      label.classList.add('active')
+      ul.prepend(label);
+      label.classList.add("active");
     } else {
       ul.appendChild(label);
     }
     ul.appendChild(input);
   });
   sendList.appendChild(ul);
-  listenGetRadio()
-  listenSendRadio()
-  setGetValue(sendInput.value)
+  listenGetRadio();
+  listenSendRadio(); 
+  setGetInput()
 }
 
+//функция рендера радио инпутов "Получить" после изменения в поле "Отправить"
 function renderRadioSelectGet() {
   const currencies = data[sendCurrent];
   getList.innerHTML = "";
   const ul = document.createElement("ul");
-  ul.classList.add('currency-field__items');
-  ul.classList.add('currency-field__items--get');
+  ul.classList.add("currency-field__items");
+  ul.classList.add("currency-field__items--get");
   Object.keys(currencies).forEach((curr, i) => {
     if (typeof currencies[curr] != "object") return;
     const input = document.createElement("input");
     const label = document.createElement("label");
     label.innerHTML = `
       <p class="currency-field__item-title">${mapName[curr].title}</p>
-    `
+    `;
     input.type = "radio";
     input.value = curr;
     input.name = "get-currency";
+    input.disabled = !(+currencies[curr].res);
     input.id = `${curr.toLowerCase()}-get`;
     input.checked = curr === getCurrent;
-    label.setAttribute('for', `${curr.toLowerCase()}-get`)
-    label.setAttribute('value', curr)
-    label.classList.add('currency-field__item')
-    // label.innerText = curr
-    label.classList.add(`currency-field__item--${curr.toLowerCase()}`)
+    input.disabled ? label.classList.add('disabled') : null
+    label.setAttribute("for", `${curr.toLowerCase()}-get`);
+    label.setAttribute("value", curr);
+    label.classList.add("currency-field__item");
+    label.classList.add(
+      `currency-field__item--${curr.toLowerCase()}`
+    );
     if (curr == getCurrent) {
-      ul.prepend(label)
-      label.classList.add('active')
+      ul.prepend(label);
+      label.classList.add("active");
     } else {
       ul.appendChild(label);
     }
     ul.appendChild(input);
   });
-  getList.appendChild(ul)
-  listenSendRadio()
-  listenGetRadio()
-  setSendValue(getInput.value)
+  getList.appendChild(ul);
+  listenSendRadio();
+  listenGetRadio();
+  setGetInput()
 }
 
-function renderGetSelect() {
-  const currencies = data[sendCurrent];
-  getSelect.innerHTML = "";
-  Object.keys(currencies).forEach((curr, i) => {
-    if (typeof currencies[curr] != "object") return;
-    const option = document.createElement("option");
-    option.value = curr;
-    option.classList.add('currency-field__item')
-    option.innerText = curr;
-    getSelect.appendChild(option);
-    if (curr == getCurrent) {
-      [...getSelect.options][i].selected = true;
-    }
-  });
-}
-
-function renderSendSelect() {
-  const currencies = data[getCurrent];
-  sendSelect.innerHTML = "";
-  Object.keys(currencies).forEach((curr, i) => {
-    if (typeof currencies[curr] != "object") return;
-    const option = document.createElement("option");
-    option.value = curr;
-    option.innerText = curr;
-    sendSelect.appendChild(option);
-    if (curr == sendCurrent) {
-      [...sendSelect.options][i].selected = true;
-    }
-  });
-}
-
-function fillInputs() {
-  sendInput.value = startSendSum;
-  getInput.value = +(startSendSum / data[sendCurrent][getCurrent].curs_in).toFixed(8);
-}
-
-
+// смена значений ссылки
 function changeLink() {
   link.innerText = `Обменять ${mapName[sendCurrent].title} на ${mapName[getCurrent].title}`;
-  link.href = `https://bitcoin24.comua/${mapName[sendCurrent].url}-to-${mapName[getCurrent].url}`;
+  link.href = `https://bitcoin24.com.ua/${mapName[sendCurrent].url}-to-${mapName[getCurrent].url}`;
 }
 
+// смена значений заголовков
 function changeTitle() {
   titleSend.innerText = `Отправить,  ${mapName[sendCurrent].title}`;
   titleGet.innerText = `Получить, ${mapName[getCurrent].title}`;
 }
 
+// сброс стилей в селектах после изменения выборы
 function resetStyle(arr, target, selector) {
   arr.forEach((el) => {
-    if (el.getAttribute('value') == target) {
-      el.classList.add(selector)
+    if (el.getAttribute("value") == target) {
+      el.classList.add(selector);
     } else {
-      el.classList.remove(selector)
+      el.classList.remove(selector);
     }
-  })
+  });
 }
 
-
-function setSendValue(val){
-  sendInput.value = +(val * data[getCurrent][sendCurrent].curs_out).toFixed(8)
+function listenSendRadio() {
+  let radioSend = sendList.querySelectorAll("input");
+  [...radioSend].forEach((input) => {
+    input.addEventListener("input", (e) => {
+      sendCurrent = e.target.value;
+      resetStyle(
+        [...sendList.querySelectorAll("label")],
+        sendCurrent,
+        "active"
+      );
+      sendList.querySelector("ul").classList.remove("open");
+      renderRadioSelectGet();
+      changeLink();
+      changeTitle();
+    });
+  });
 }
 
-function setGetValue(val){
-  getInput.value = +(val / data[sendCurrent][getCurrent].curs_in).toFixed(8);
+function listenGetRadio() {
+  let radioGet = getList.querySelectorAll("input");
+  [...radioGet].forEach((input) => {
+    input.addEventListener("input", (e) => {
+      getCurrent = e.target.value;
+      resetStyle(
+        [...getList.querySelectorAll("label")],
+        getCurrent,
+        "active"
+      );
+      getList.querySelector("ul").classList.remove("open");
+      renderRadioSelectSend();
+      changeLink();
+      changeTitle();
+    });
+  });
 }
-getInput.addEventListener("input", (e) => setSendValue(e.target.value));
-sendInput.addEventListener("input", (e) => setGetValue(e.target.value));
 
+function setSendInput(){
+  let res;
+  if(reversed){
+    res = (getInput.value / data[sendCurrent][getCurrent].curs_out).toFixed(2)
+  }
+  else{
+    res = (getInput.value * data[sendCurrent][getCurrent].curs_in).toFixed(2)
+  }
+  sendInput.value = +res
+}
 
-// renderGetSelect();
-// renderSendSelect();
-fillInputs();
+function resetInputs(){
+  sendInput.value = data[sendCurrent][getCurrent].curs_in;
+  getInput.value = data[sendCurrent][getCurrent].curs_out;
+}
+
+function detectOperation(curr){
+
+}
+
+function setGetInput(){
+  if(data[sendCurrent][getCurrent].curs_in > data[sendCurrent][getCurrent].curs_out){
+    getInput.value = +(sendInput.value / data[sendCurrent][getCurrent].curs_in).toFixed(5); 
+  }
+  else{
+    getInput.value = +(sendInput.value * data[sendCurrent][getCurrent].curs_out).toFixed(5); 
+  }
+}
+
+sendInput.addEventListener('input', (e) => {
+  if(/[^0-9.]/.test(e.target.value.toString())){
+    sendInput.classList.add('error')
+    return
+  }
+  sendInput.classList.remove('error')
+  setGetInput()
+})
+
+getInput.addEventListener('input', (e) => {
+  if(/[^0-9.]/.test(e.target.value.toString())){
+    getInput.classList.add('error')
+    return
+  }
+  getInput.classList.remove('error')
+  setSendInput()
+})
+
+sendInput.value = startSendSum;
+setGetInput()
 changeLink();
 changeTitle();
-
-
-console.log(data);
